@@ -1,11 +1,16 @@
 module.exports = {
-  purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
-  darkMode: false, 
+  purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  darkMode: false,
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        height: "height",
+        spacing: "margin, padding",
+      },
+    },
   },
   variants: {
-    extend: {},
+    extend: { height: ["responsive", "hover", "focus"] },
   },
   plugins: [],
-}
+};

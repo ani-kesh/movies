@@ -1,13 +1,9 @@
-// import Login from "./components/Login";
-// import Nav from "./components/Nav";
-import Movies from "./components/Movies";
+import  Nav  from "./components/Nav";
 
 function App() {
   return (
     <div>
-      {/* <Nav/>
-      <Login/> */}
-      <Movies/>
+      <Nav/>
     </div>
   );
 }
