@@ -1,6 +1,6 @@
-import React from "react";
-import { useHistory} from "react-router-dom";
-// ,useState,useEffect 
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { getItems, setItems } from "./../helpers/localStorage";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 let classNames = require("classnames");
 
@@ -45,9 +45,36 @@ let buttonClass = classNames({
   rounded: true,
 });
 
-
 function Login() {
   let history = useHistory();
+  let [isAuth, setIsAuth] = useState(false);
+  let [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    setIsAuth(
+      getItems("isAuth") !== null ? Boolean(getItems("isAuth")) : false
+    );
+  }, [isAuth]);
+
+  useEffect(() => {
+    setUsers(getItems("users") !== null ? [...getItems("users")] : []);
+  }, []);
+
+  const isExistUser = (username, password) => {
+    if (users.length > 0) {
+      const user = users.filter((el) => {
+        return el.username === username;
+      });
+
+      if (user.length === 0) {
+        setUsers([...users, { username, password }]);
+        setItems("users", [...users, { username, password }]);
+      }
+    } else {
+      setUsers([{ username, password }]);
+      setItems("users", [{ username, password }]);
+    }
+  };
 
   return (
     <div>
@@ -62,11 +89,19 @@ function Login() {
           ) {
             errors.email = "Invalid email address";
           }
+          setIsAuth(false);
+          setItems("isAuth", false);
+          setItems("currentUser", "");
           return errors;
         }}
         onSubmit={async (values) => {
-          if (values.email.trim() !== "" && values.password.trim() !== "")
+          if (values.email.trim() !== "" && values.password.trim() !== "") {
+            setIsAuth(true);
+            setItems("isAuth", true);
+            setItems("currentUser", values.email.trim());
+            isExistUser(values.email.trim(), values.password.trim());
             history.push("/movies");
+          }
         }}
       >
         {({ isSubmitting }) => (

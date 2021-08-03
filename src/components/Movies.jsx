@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react"; //
+import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 import { getMovies, getMoviePosterURL, getGenre } from "../data/movies.data";
-// import Nav from "./Nav";
-import {Bookmark,Minus} from "./Icons";
+import { getItems, setItems } from "./../helpers/localStorage";
+import { Routes } from "./../constants/router";
+import { Bookmark, Minus } from "./Icons";
 let classNames = require("classnames");
 
 const container = classNames({
@@ -21,13 +23,47 @@ const animationStyle = classNames([
 ]);
 const animationTop = classNames(["h-1/3"]);
 const animationBottom = classNames(["h-2/3"]);
-const topDiv = classNames(["absolute", "top-0", "bg-green-900"]);
-const bottomDiv = classNames(["absolute", "bottom-0", "bg-blue-900"]);
+const topDiv = classNames([
+  "flex",
+  "justify-center",
+  "items-center",
+  "absolute",
+  "top-0",
+  "bg-indigo-400",
+  "bg-opacity-75",
+]);
+const bottomDiv = classNames([
+  "absolute",
+  "bottom-0",
+  "bg-indigo-600",
+  "bg-opacity-75",
+  "flex",
+  "flex-wrap",
+  "content-between",
+]);
 
 export default function Movies() {
   const [movies, setMovies] = useState([]);
   const [animation, setAnimation] = useState(false);
+  const [isAuth, setIsAuth] = useState(Boolean(getItems("isAuth")));
+  const [currentUser] = useState(getItems("currentUser"));
+  const [favoriteMovies, setFavoriteMovies] = useState(
+    getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : []
+  );  
+  const [currentUserFavMovies, setCurrentUserFavMovies] = useState([]);
+  
+  
   useEffect(() => {
+    const favMovies = favoriteMovies.length >0 ?favoriteMovies : [];
+    const currentUserFav = favMovies.filter((el) =>{
+      return el.userId === currentUser;
+    });
+    
+    setCurrentUserFavMovies((currentUserFav.length > 0)?currentUserFav[0].movieIds:[]);
+  }, [favoriteMovies,currentUser])
+
+  useEffect(() => {
+    setIsAuth(Boolean(getItems("isAuth")));
     getMovies().then((result) => {
       getGenre().then((res) => {
         const movies = result.results.map((el) => {
@@ -55,11 +91,49 @@ export default function Movies() {
     setAnimation(false);
   };
 
-  return (
+  const handleIsBookmark = (ev) => {
+    const favMovies = getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : [];
+    const id = ev.target.id;
+
+    if(favMovies.length > 0){      
+      const currentUserFav = favMovies.filter((el) =>{
+        return el.userId === currentUser;
+      });
+      if(currentUserFav.length > 0){
+        let favIds = currentUserFav[0].movieIds;
+        let updatedFavIds = [];
+        if(favIds.includes(id)){
+          updatedFavIds = favIds.filter((el)=>{
+            return id !== el
+          })
+        }
+        else{
+          updatedFavIds = [...favIds,id];
+        }
+        let updatedFavMovies = favMovies.map((el) =>{
+          if(el.userId === currentUser) {
+            return {userId: currentUser, movieIds: updatedFavIds,}
+          }
+          return el;
+        });
+        setItems("favoriteMovies", updatedFavMovies);
+        setFavoriteMovies(updatedFavMovies);
+      }
+      else{
+        setItems("favoriteMovies", [...favMovies,{ userId: currentUser, movieIds: [id] }]);
+        setFavoriteMovies([...favMovies,{ userId: currentUser, movieIds: [id] }]);
+      }
+    }
+    else{
+      setItems("favoriteMovies", [{ userId: currentUser, movieIds: [id] }]);
+      setFavoriteMovies([{ userId: currentUser, movieIds: [id] }]);
+    }
+  }
+
+  return isAuth ? (
     <>
       <div className={container}>
         {movies.map((el) => {
-          //console.log(el);
           return (
             <div
               key={Math.random()}
@@ -74,8 +148,11 @@ export default function Movies() {
                     : `${animationStyle} ${animationTop}`
                 }`}
               >
-                <Bookmark/>
-                <Minus/>
+             { 
+             (currentUserFavMovies.some((elem)=>{return Number(elem) === Number(el.id)})?
+             <Minus handleBookmark={handleIsBookmark} id={el.id} />:
+             <Bookmark handleBookmark={handleIsBookmark} id={el.id} />
+             )}
               </div>
               <div
                 className={`${bottomDiv} ${
@@ -84,12 +161,24 @@ export default function Movies() {
                     : `${animationStyle} ${animationBottom}`
                 }`}
               >
-                {typeof el.title !== "undefined" ? el.title : ""}
-                {typeof el.genre_ids !== "undefined"
-                  ? el.genre_ids.map((el) => {
-                      return <span key={Math.random()}>{el}</span>;
-                    })
-                  : ""}
+                <div className="w-full flex flex-wrap justify-center text-white text-center text-lg font-semibold">
+                  {typeof el.title !== "undefined" ? el.title : ""}
+                </div>
+
+                <div className="w-full overflow-hidden flex flex-wrap justify-center text-center text-xs font-lg">
+                  {typeof el.genre_ids !== "undefined"
+                    ? el.genre_ids.map((el) => {
+                        return (
+                          <div
+                            className="m-1 px-2 py-0.5 rounded-lg bg-gray-700 font-medium text-white"
+                            key={Math.random()}
+                          >
+                            {el}
+                          </div>
+                        );
+                      })
+                    : ""}
+                </div>
               </div>
               <img src={`${getMoviePosterURL()}${el.poster_path}`} alt="" />
             </div>
@@ -97,5 +186,7 @@ export default function Movies() {
         })}
       </div>
     </>
+  ) : (
+    <Redirect to={Routes.login().path} />
   );
 }
