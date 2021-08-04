@@ -1,10 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-
+import { Link } from "react-router-dom";
+import Input from "./Input";
 import { Routes } from "../constants/router";
 let classNames = require("classnames");
 
-const nav = classNames({ "bg-yellow-600": true, block: true });
+const nav = classNames({ "bg-purple-800": true, block: true });
 const navDesktop = classNames([
   "max-w-7xl",
   "mx-auto",
@@ -33,45 +33,90 @@ const navButtonLogo = classNames([
   "items-center",
   "text-white",
 ]);
+const linkText = classNames([
+  "text-gray-300",
+  "hover:bg-gray-700",
+  "hover:text-white",
+  "px-3",
+  "py-2",
+  "rounded-md",
+  "text-sm",
+  "font-medium",
+]);
+const signOutContainer = classNames([
+  "absolute",
+  "inset-y-0",
+  "right-0",
+  "flex",
+  "items-center",
+  "pr-2",
+  "sm:static",
+  "sm:inset-auto",
+  "sm:ml-6",
+  "sm:pr-0",
+]);
+
+const signOutBtn = classNames([
+  "bg-transparent",
+  "hover:bg-blue-500",
+  "text-gray-200",
+  "font-semibold",
+  "hover:text-white",
+  "py-2",
+  "px-4",
+  "border",
+  "border-gray-200",
+  "hover:border-transparent",
+  "rounded",
+]);
+
+const searchStyle = classNames([
+  "bg-purple-600",
+  "text-white",
+  "w-96",
+  "border-none",
+  "mr-3",
+  "px-2",
+  "leading-tight",
+  "focus:outline-none",
+]);
 const navButtonsRouter = classNames(["hidden", "sm:block", "sm:ml-6"]);
+const signOut = classNames(["ml-3", "relative"]);
 
-
-export default function Nav() {
-
+export default function Nav({ search ,logOut}) {
   return (
-    <Router>   
+    <>
       <nav className={nav}>
         <div className={navDesktop}>
           <div className={navButtons}>
             <div className={navButtonsMenu}>
               <div className={navButtonLogo}>{``}</div>
               <div className={navButtonsRouter}>
-                <div className="flex space-x-4">
+                <div className="flex space-x-10">
                   {Object.values(Routes).map((fn) => {
                     const { path, text } = fn();
-                     return path.includes("favorite") || path.includes("movies") ? (
-                     <Link
-                        to={path}
-                        key={Math.random()}
-                        className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                      >
+                    return path.includes("favorite") ||
+                      path.includes("movies") ? (
+                      <Link to={path} key={Math.random()} className={linkText}>
                         {text}
                       </Link>
-                    ) 
-                    : (
+                    ) : (
                       <span key={Math.random()}></span>
                     );
                   })}
+                  <Input
+                    onChange={search}
+                    className={searchStyle}
+                    type="text"
+                    placeholder="Search"
+                  />
                 </div>
               </div>
             </div>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <div className="ml-3 relative">
+            <div className={signOutContainer}>
+              <div className={signOut}>
                 <div>
-                  <button
-                    type="button"
-                    className="bg-gray-800 flex text-sm p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                  >
+                  <button type="button" className={signOutBtn} onClick={logOut}>
                     Sign Out
                   </button>
                 </div>
@@ -80,9 +125,9 @@ export default function Nav() {
           </div>
         </div>
 
-        <div className="sm:hidden" id="mobile-menu">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {/* <a
+        {/* <div className="sm:hidden" id="mobile-menu"> */}
+        {/* <div className="px-2 pt-2 pb-3 space-y-1"> */}
+        {/* <a
               href="#"
               className="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
               aria-current="page"
@@ -96,24 +141,9 @@ export default function Nav() {
             >
               Calendar
             </a> */}
-          </div>
-        </div>
+        {/* </div>
+        </div> */}
       </nav>
-
-      <Switch>
-              {Object.values(Routes).map((fn) => {
-                const { path, component } = fn();
-
-                return (
-                  <Route
-                    exact
-                    path={path}
-                    component={component}
-                    key={Math.random()}
-                  />
-                );
-              })}
-            </Switch>
-    </Router>
+    </>
   );
 }

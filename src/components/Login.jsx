@@ -47,14 +47,7 @@ let buttonClass = classNames({
 
 function Login() {
   let history = useHistory();
-  let [isAuth, setIsAuth] = useState(false);
   let [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    setIsAuth(
-      getItems("isAuth") !== null ? Boolean(getItems("isAuth")) : false
-    );
-  }, [isAuth]);
 
   useEffect(() => {
     setUsers(getItems("users") !== null ? [...getItems("users")] : []);
@@ -89,14 +82,12 @@ function Login() {
           ) {
             errors.email = "Invalid email address";
           }
-          setIsAuth(false);
           setItems("isAuth", false);
           setItems("currentUser", "");
           return errors;
         }}
         onSubmit={async (values) => {
           if (values.email.trim() !== "" && values.password.trim() !== "") {
-            setIsAuth(true);
             setItems("isAuth", true);
             setItems("currentUser", values.email.trim());
             isExistUser(values.email.trim(), values.password.trim());

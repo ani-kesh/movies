@@ -1,19 +1,7 @@
 import PropTypes from 'prop-types';
-let classNames = require('classnames');
 
-const inputClass = classNames({
-    "shadow":true,
-    "appearance-none":true,
-    "border":true,
-    "rounded":true,
-    "w-full":true,
-    "py-2":true,
-    "px-3":true,
-    "text-grey-darker":true,
-  });
-
-export default function Input({className,id,type,placeholder,name}){
-    return  <input className={className} id={id} type={type} name={name} placeholder={placeholder}/>
+export default function Input({className,id,type,placeholder,name,onChange}){
+    return  <input className={`${className}`} id={id} type={type} name={name} placeholder={placeholder} onChange={onChange}/>
 }
 
 Input.propTypes={
@@ -22,10 +10,10 @@ Input.propTypes={
     type:PropTypes.string,
     placeholder:PropTypes.string,
     name:PropTypes.string,
+    onChange:PropTypes.func,
 }
 
-Input.defaultProps = {
-    className:inputClass,
+Input.defaultProps = {    
     id:"",
     type:"text",
     placeholder:"",

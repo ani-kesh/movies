@@ -1,9 +1,13 @@
-import  Nav  from "./components/Nav";
+
+import { BrowserRouter as Router } from "react-router-dom";
+import  General  from "./components/General";
 
 function App() {
   return (
     <div>
-      <Nav/>
+      <Router> 
+        <General/>      
+      </Router>
     </div>
   );
 }
