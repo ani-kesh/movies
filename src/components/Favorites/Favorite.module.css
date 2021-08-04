@@ -35,6 +35,10 @@
   transition: height 1s;
 }
 
+.movie:hover{
+  cursor:pointer;
+}
+
 .movie:hover > .bookmark,
 .bookmark:hover {
   height: 100px;

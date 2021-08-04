@@ -107,11 +107,10 @@ export default function Movies({ searchResult }) {
     });
   }, [page]);
 
-  const handleIsBookmark = (ev) => {
+  const handleIsBookmark = (id) => (ev) => {
     ev.stopPropagation();
     const favMovies =
       getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : [];
-    const id = ev.target.id;
 
     if (id !== "") {
       if (favMovies.length > 0) {
@@ -123,7 +122,7 @@ export default function Movies({ searchResult }) {
           let updatedFavIds = [];
           if (favIds.includes(id)) {
             updatedFavIds = favIds.filter((el) => {
-              return id !== el;
+              return Number(id) !== Number(el);
             });
           } else {
             updatedFavIds = [...favIds, id];
@@ -175,9 +174,13 @@ export default function Movies({ searchResult }) {
                   {currentUserFavMovies.some((elem) => {
                     return Number(elem) === Number(el.id);
                   }) ? (
-                    <Minus handleBookmark={handleIsBookmark} id={el.id} />
+                    <div onClick={handleIsBookmark(el.id)}>
+                      <Minus id={el.id} />
+                    </div>
                   ) : (
-                    <Bookmark handleBookmark={handleIsBookmark} id={el.id} />
+                    <div onClick={handleIsBookmark(el.id)}>
+                      <Bookmark id={el.id} />
+                    </div>
                   )}
                 </div>
 
