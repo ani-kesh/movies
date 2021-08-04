@@ -43,7 +43,7 @@ export default function Movie(props) {
     getMovieById(movieId).then((res) => {
       setMovieInfo(res);
     });
-  }, []);
+  }, [movieId]);
 
   return isAuth ? (
     <div className={container}>

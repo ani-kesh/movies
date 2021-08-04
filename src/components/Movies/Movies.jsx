@@ -1,6 +1,6 @@
 import styles from "./Movies.module.css";
 import React, { useState, useEffect } from "react";
-import { Redirect ,useHistory} from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import { getMovies, getMoviePosterURL, getGenre } from "../../data/movies.data";
 import { getItems, setItems } from "../../helpers/localStorage";
 import { Routes } from "../../constants/router";
@@ -108,6 +108,7 @@ export default function Movies({ searchResult }) {
   }, [page]);
 
   const handleIsBookmark = (ev) => {
+    ev.stopPropagation();
     const favMovies =
       getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : [];
     const id = ev.target.id;
@@ -154,17 +155,22 @@ export default function Movies({ searchResult }) {
     }
   };
 
-  const handleMovie = (id)=>{
+  const handleMovie = (id) => (ev) => {
+    ev.stopPropagation();
     history.push(Routes.movie(id).path);
-  }
+  };
 
   return isAuth ? (
-      <div>
+    <div>
       <div className={container}>
         {movies.length > 0 ? (
           movies.map((el) => {
             return (
-              <div key={Math.random()} className={styles.movie} onClick={()=>handleMovie(el.id)}>
+              <div
+                key={Math.random()}
+                className={styles.movie}
+                onClick={handleMovie(el.id)}
+              >
                 <div className={styles.bookmark}>
                   {currentUserFavMovies.some((elem) => {
                     return Number(elem) === Number(el.id);
