@@ -87,6 +87,7 @@ export default function Movies({ searchResult }) {
   }, []);
 
   useEffect(() => {
+    let mounted = true;
     getMovies(page).then((result) => {
       getGenre().then((res) => {
         const movies = result.results.map((el) => {
@@ -101,10 +102,16 @@ export default function Movies({ searchResult }) {
           }
           return el;
         });
-        setMovies([...movies]);
-        setAllMovies([...movies]);
+        if (mounted) {
+          setMovies([...movies]);
+          setAllMovies([...movies]);
+        }
       });
     });
+
+    return function cleanup() {
+      mounted = false;
+    };
   }, [page]);
 
   const handleIsBookmark = (id) => (ev) => {

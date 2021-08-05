@@ -17,11 +17,18 @@ export default function General() {
   }, [location]);
 
   const handleSearch = (ev) => {
+    let mounted = true;
     if (ev.target.value.trim !== "") {
       searchMovie(ev.target.value).then((result) => {
-        setSearchResult(result);
+        if (mounted) {
+          setSearchResult(result);
+        }
       });
     }
+
+    return function cleanup() {
+      mounted = false;
+    };
   };
   
   const handleLogOut = ()=>{

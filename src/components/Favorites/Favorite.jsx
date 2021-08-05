@@ -71,6 +71,7 @@ export default function Favorite() {
   }, [favoriteMovies, currentUser]);
 
   useEffect(() => {
+    let mounted = true;
     setIsAuth(Boolean(getItems("isAuth")));
     getMovies().then((result) => {
       getGenre().then((res) => {
@@ -93,10 +94,15 @@ export default function Favorite() {
 
           return favMovie[0];
         });
-
-        setMovies([...favMovies]);
+        if (mounted) {
+          setMovies([...favMovies]);
+        }
       });
     });
+
+    return function cleanup() {
+      mounted = false;
+    };
   }, [currentUserFavMovies]);
 
   const handleIsBookmark = (id) => (ev) => {
