@@ -3,6 +3,7 @@ import { Redirect } from "react-router-dom";
 import { getMovieById, getMoviePosterURLFor400 } from "./../data/movies.data";
 import { getItems } from "../helpers/localStorage";
 import { Routes } from "../constants/router";
+import {EmptyCoverPicture} from "./Pictures";
 let classNames = require("classnames");
 
 const container = classNames(["p-20", "min-h-screen", "bg-purple-800"]);
@@ -40,9 +41,16 @@ export default function Movie(props) {
   }, []);
 
   useEffect(() => {
+    let mounted = true;
     getMovieById(movieId).then((res) => {
-      setMovieInfo(res);
+      if (mounted) {
+        setMovieInfo(res);
+      }
     });
+
+    return function cleanup() {
+      mounted = false;
+    };
   }, [movieId]);
 
   return isAuth ? (
@@ -50,11 +58,16 @@ export default function Movie(props) {
       <div className={cardContainer}>
         <div className={card}>
           <div className={imgContainer}>
-            <img
-              className={img}
-              src={`${getMoviePosterURLFor400()}${movieInfo.poster_path}`}
-              alt={movieInfo.title}
-            />
+            {typeof movieInfo.poster_path !== "undefined" &&
+            movieInfo.poster_path !== null ? (
+              <img
+                className={img}
+                src={`${getMoviePosterURLFor400()}${movieInfo.poster_path}`}
+                alt={movieInfo.title}
+              />
+            ) : (
+              <EmptyCoverPicture/>
+            )}
           </div>
           <div className={about}>
             <div className={title}>{movieInfo.title}</div>
@@ -68,8 +81,7 @@ export default function Movie(props) {
         </div>
       </div>
     </div>
-  ):
-  (
+  ) : (
     <Redirect to={Routes.login().path} />
   );
 }

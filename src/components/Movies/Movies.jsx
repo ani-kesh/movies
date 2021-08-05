@@ -1,12 +1,11 @@
 import styles from "./Movies.module.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import { getMovies, getMoviePosterURL, getGenre } from "../../data/movies.data";
 import { getItems, setItems } from "../../helpers/localStorage";
 import { Routes } from "../../constants/router";
 import { Bookmark, Minus } from "../Icons";
 import { EmptyCoverPicture } from "../Pictures";
-// import useScrollPosition from "@react-hook/window-scroll";
 
 let classNames = require("classnames");
 
@@ -49,19 +48,35 @@ const genreItem = classNames([
   "font-medium",
   "text-white",
 ]);
+
 export default function Movies({ searchResult }) {
   let history = useHistory();
-  // const scrollY = useScrollPosition(60);
-  const [page] = useState(1);
   const [allMovies, setAllMovies] = useState([]);
   const [movies, setMovies] = useState([]);
-  // const [animation, setAnimation] = useState(false);
   const [isAuth, setIsAuth] = useState(Boolean(getItems("isAuth")));
   const [currentUser] = useState(getItems("currentUser"));
   const [favoriteMovies, setFavoriteMovies] = useState(
     getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : []
   );
   const [currentUserFavMovies, setCurrentUserFavMovies] = useState([]);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const observer = useRef();
+  const lastMovieElRef = useCallback(
+    (node) => {
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && totalPages >= page + 1) {
+          setPage(page + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [hasMore, page, totalPages]
+  );
 
   useEffect(() => {
     const favMovies = favoriteMovies.length > 0 ? favoriteMovies : [];
@@ -90,21 +105,25 @@ export default function Movies({ searchResult }) {
     let mounted = true;
     getMovies(page).then((result) => {
       getGenre().then((res) => {
-        const movies = result.results.map((el) => {
-          if (typeof el.genre_ids !== "undefined") {
-            let genreNames = el.genre_ids.map((elem) => {
-              let name = res.genres.filter((el) => {
-                return elem === el.id;
+        if (typeof result.results !== "undefined") {
+          const newMovies = result.results.map((el) => {
+            if (typeof el.genre_ids !== "undefined") {
+              let genreNames = el.genre_ids.map((elem) => {
+                let name = res.genres.filter((el) => {
+                  return elem === el.id;
+                });
+                return name[0].name;
               });
-              return name[0].name;
-            });
-            return { ...el, genre_ids: [...genreNames] };
+              return { ...el, genre_ids: [...genreNames] };
+            }
+            return el;
+          });
+          if (mounted) {
+            setHasMore(result.results.length > 0);
+            setMovies((movies) => [...movies, ...newMovies]);
+            setAllMovies((movies) => [...movies, ...newMovies]);
+            setTotalPages(result.total_pages);
           }
-          return el;
-        });
-        if (mounted) {
-          setMovies([...movies]);
-          setAllMovies([...movies]);
         }
       });
     });
@@ -170,54 +189,105 @@ export default function Movies({ searchResult }) {
     <div>
       <div className={container}>
         {movies.length > 0 ? (
-          movies.map((el) => {
-            return (
-              <div
-                key={Math.random()}
-                className={styles.movie}
-                onClick={handleMovie(el.id)}
-              >
-                <div className={styles.bookmark}>
-                  {currentUserFavMovies.some((elem) => {
-                    return Number(elem) === Number(el.id);
-                  }) ? (
-                    <div onClick={handleIsBookmark(el.id)}>
-                      <Minus id={el.id} />
-                    </div>
-                  ) : (
-                    <div onClick={handleIsBookmark(el.id)}>
-                      <Bookmark id={el.id} />
-                    </div>
-                  )}
-                </div>
+          movies.map((el, index) => {
+            if (movies.length === index + 1) {
+              return (
+                <div
+                  ref={lastMovieElRef}
+                  key={Math.random()}
+                  className={styles.movie}
+                  onClick={handleMovie(el.id)}
+                >
+                  <div className={styles.bookmark}>
+                    {currentUserFavMovies.some((elem) => {
+                      return Number(elem) === Number(el.id);
+                    }) ? (
+                      <div onClick={handleIsBookmark(el.id)}>
+                        <Minus id={el.id} />
+                      </div>
+                    ) : (
+                      <div onClick={handleIsBookmark(el.id)}>
+                        <Bookmark id={el.id} />
+                      </div>
+                    )}
+                  </div>
 
-                <div className={styles.about}>
-                  <div className={title}>
-                    {typeof el.title !== "undefined" ? el.title : ""}
+                  <div className={styles.about}>
+                    <div className={title}>
+                      {typeof el.title !== "undefined" ? el.title : ""}
 
-                    <div className={genres}>
-                      {typeof el.genre_ids !== "undefined"
-                        ? el.genre_ids.map((el) => {
-                            return (
-                              <div className={genreItem} key={Math.random()}>
-                                {el}
-                              </div>
-                            );
-                          })
-                        : ""}
+                      <div className={genres}>
+                        {typeof el.genre_ids !== "undefined"
+                          ? el.genre_ids.map((el) => {
+                              return (
+                                <div className={genreItem} key={Math.random()}>
+                                  {el}
+                                </div>
+                              );
+                            })
+                          : ""}
+                      </div>
                     </div>
                   </div>
+                  {el.poster_path !== null ? (
+                    <img
+                      src={`${getMoviePosterURL()}${el.poster_path}`}
+                      alt={el.title}
+                    />
+                  ) : (
+                    <EmptyCoverPicture />
+                  )}
                 </div>
-                {el.poster_path !== null ? (
-                  <img
-                    src={`${getMoviePosterURL()}${el.poster_path}`}
-                    alt={el.title}
-                  />
-                ) : (
-                  <EmptyCoverPicture />
-                )}
-              </div>
-            );
+              );
+            } else {
+              return (
+                <div
+                  key={Math.random()}
+                  className={styles.movie}
+                  onClick={handleMovie(el.id)}
+                >
+                  <div className={styles.bookmark}>
+                    {currentUserFavMovies.some((elem) => {
+                      return Number(elem) === Number(el.id);
+                    }) ? (
+                      <div onClick={handleIsBookmark(el.id)}>
+                        <Minus id={el.id} />
+                      </div>
+                    ) : (
+                      <div onClick={handleIsBookmark(el.id)}>
+                        <Bookmark id={el.id} />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.about}>
+                    <div className={title}>
+                      {typeof el.title !== "undefined" ? el.title : ""}
+
+                      <div className={genres}>
+                        {typeof el.genre_ids !== "undefined"
+                          ? el.genre_ids.map((el) => {
+                              return (
+                                <div className={genreItem} key={Math.random()}>
+                                  {el}
+                                </div>
+                              );
+                            })
+                          : ""}
+                      </div>
+                    </div>
+                  </div>
+                  {el.poster_path !== null ? (
+                    <img
+                      src={`${getMoviePosterURL()}${el.poster_path}`}
+                      alt={el.title}
+                    />
+                  ) : (
+                    <EmptyCoverPicture />
+                  )}
+                </div>
+              );
+            }
           })
         ) : (
           <></>
