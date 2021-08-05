@@ -4,7 +4,7 @@ import Input from "./Input";
 import { Routes } from "../constants/router";
 let classNames = require("classnames");
 
-const nav = classNames({ "bg-purple-800": true, block: true });
+const nav = classNames({ "bg-indigo-900": true, block: true });
 const navDesktop = classNames([
   "max-w-7xl",
   "mx-auto",
@@ -83,7 +83,22 @@ const searchStyle = classNames([
 const navButtonsRouter = classNames(["hidden", "sm:block", "sm:ml-6"]);
 const signOut = classNames(["ml-3", "relative"]);
 
-export default function Nav({ search ,logOut}) {
+/* mobile styles */
+
+const mobileMenu = classNames(["sm:hidden"]);
+const navItem = classNames(["px-2", "pt-2", "pb-3", "space-y-1"]);
+const navBtn = classNames([
+  "bg-gray-900",
+  "text-white",
+  "block",
+  "px-3",
+  "py-2",
+  "rounded-md",
+  "text-base",
+  "font-medium",
+]);
+
+export default function Nav({ search, logOut }) {
   return (
     <>
       <nav className={nav}>
@@ -125,24 +140,20 @@ export default function Nav({ search ,logOut}) {
           </div>
         </div>
 
-        {/* <div className="sm:hidden" id="mobile-menu"> */}
-        {/* <div className="px-2 pt-2 pb-3 space-y-1"> */}
-        {/* <a
-              href="#"
-              className="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
-              aria-current="page"
-            >
-              Dashboard
-            </a>
-
-            <a
-              href="#"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-            >
-              Calendar
-            </a> */}
-        {/* </div>
-        </div> */}
+        <div className={mobileMenu} id="mobile-menu">
+          <div className={navItem}>
+            {Object.values(Routes).map((fn) => {
+              const { path, text } = fn();
+              return path.includes("favorite") || path.includes("movies") ? (
+                <Link to={path} key={Math.random()} className={navBtn}>
+                  {text}
+                </Link>
+              ) : (
+                <span key={Math.random()}></span>
+              );
+            })}
+          </div>
+        </div>
       </nav>
     </>
   );

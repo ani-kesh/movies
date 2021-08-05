@@ -13,7 +13,7 @@ const container = classNames({
   "flex-wrap": true,
   "w-full": true,
   "justify-center": true,
-  "bg-purple-800": true,
+  "bg-indigo-900": true,
   "min-h-screen": true,
 });
 

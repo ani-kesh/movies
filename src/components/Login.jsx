@@ -9,7 +9,7 @@ const container = classNames([
   "w-full",
   "h-screen",
   "items-center",
-  "bg-purple-800",
+  "bg-indigo-400",
 ]);
 const containerLogin = classNames([
   "px-8",

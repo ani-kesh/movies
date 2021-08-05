@@ -6,7 +6,7 @@ import { Routes } from "../constants/router";
 import {EmptyCoverPicture} from "./Pictures";
 let classNames = require("classnames");
 
-const container = classNames(["p-20", "min-h-screen", "bg-purple-800"]);
+const container = classNames(["p-20", "min-h-screen", "bg-indigo-900"]);
 const cardContainer = classNames([
   "max-w-md",
   "mx-auto",

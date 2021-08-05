@@ -14,7 +14,7 @@ const container = classNames({
   "flex-wrap": true,
   "w-full": true,
   "justify-center": true,
-  "bg-purple-800": true,
+  "bg-indigo-900": true,
   "min-h-screen": true,
 });
 const title = classNames([
@@ -58,6 +58,7 @@ export default function Movies({ searchResult }) {
   const [favoriteMovies, setFavoriteMovies] = useState(
     getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : []
   );
+
   const [currentUserFavMovies, setCurrentUserFavMovies] = useState([]);
 
   const [page, setPage] = useState(1);
@@ -80,13 +81,16 @@ export default function Movies({ searchResult }) {
 
   useEffect(() => {
     const favMovies = favoriteMovies.length > 0 ? favoriteMovies : [];
+
     const currentUserFav = favMovies.filter((el) => {
       return el.userId === currentUser;
     });
 
-    setCurrentUserFavMovies(
-      currentUserFav.length > 0 ? currentUserFav[0].movieIds : []
-    );
+    if (typeof currentUserFav[0] !== "undefined") {
+      setCurrentUserFavMovies(
+        currentUserFav[0].movieIds ? currentUserFav[0].movieIds : {}
+      );
+    }
   }, [favoriteMovies, currentUser]);
 
   useEffect(() => {
@@ -133,29 +137,30 @@ export default function Movies({ searchResult }) {
     };
   }, [page]);
 
-  const handleIsBookmark = (id) => (ev) => {
+  const handleIsBookmark = (el) => (ev) => {
     ev.stopPropagation();
     const favMovies =
       getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : [];
 
+    const id = String(el.id);
     if (id !== "") {
       if (favMovies.length > 0) {
         const currentUserFav = favMovies.filter((el) => {
           return el.userId === currentUser;
         });
+
         if (currentUserFav.length > 0) {
-          let favIds = currentUserFav[0].movieIds;
-          let updatedFavIds = [];
+          let favMovieObjs = currentUserFav[0].movieIds;
+          let favIds = Object.keys(favMovieObjs);
+
           if (favIds.includes(id)) {
-            updatedFavIds = favIds.filter((el) => {
-              return Number(id) !== Number(el);
-            });
+            delete favMovieObjs[id];
           } else {
-            updatedFavIds = [...favIds, id];
+            favMovieObjs = { ...favMovieObjs, [id]: el };
           }
           let updatedFavMovies = favMovies.map((el) => {
             if (el.userId === currentUser) {
-              return { userId: currentUser, movieIds: updatedFavIds };
+              return { userId: currentUser, movieIds: favMovieObjs };
             }
             return el;
           });
@@ -164,18 +169,18 @@ export default function Movies({ searchResult }) {
         } else {
           setItems("favoriteMovies", [
             ...favMovies,
-            { userId: currentUser, movieIds: [id] },
+            { userId: currentUser, movieIds: { [id]: el } },
           ]);
           setFavoriteMovies([
             ...favMovies,
-            { userId: currentUser, movieIds: [id] },
+            { userId: currentUser, movieIds: { [id]: el } },
           ]);
         }
       } else {
         setItems("favoriteMovies", [
-          { userId: currentUser, movieIds: [id], movies },
+          { userId: currentUser, movieIds: { [id]: el } },
         ]);
-        setFavoriteMovies([{ userId: currentUser, movieIds: [id] }]);
+        setFavoriteMovies([{ userId: currentUser, movieIds: { [id]: el } }]);
       }
     }
   };
@@ -199,14 +204,14 @@ export default function Movies({ searchResult }) {
                   onClick={handleMovie(el.id)}
                 >
                   <div className={styles.bookmark}>
-                    {currentUserFavMovies.some((elem) => {
-                      return Number(elem) === Number(el.id);
-                    }) ? (
-                      <div onClick={handleIsBookmark(el.id)}>
+                    {Object.keys(currentUserFavMovies).includes(
+                      String(el.id)
+                    ) ? (
+                      <div onClick={handleIsBookmark(el)}>
                         <Minus id={el.id} />
                       </div>
                     ) : (
-                      <div onClick={handleIsBookmark(el.id)}>
+                      <div onClick={handleIsBookmark(el)}>
                         <Bookmark id={el.id} />
                       </div>
                     )}
@@ -247,14 +252,14 @@ export default function Movies({ searchResult }) {
                   onClick={handleMovie(el.id)}
                 >
                   <div className={styles.bookmark}>
-                    {currentUserFavMovies.some((elem) => {
-                      return Number(elem) === Number(el.id);
-                    }) ? (
-                      <div onClick={handleIsBookmark(el.id)}>
+                    {Object.keys(currentUserFavMovies).includes(
+                      String(el.id)
+                    ) ? (
+                      <div onClick={handleIsBookmark(el)}>
                         <Minus id={el.id} />
                       </div>
                     ) : (
-                      <div onClick={handleIsBookmark(el.id)}>
+                      <div onClick={handleIsBookmark(el)}>
                         <Bookmark id={el.id} />
                       </div>
                     )}
