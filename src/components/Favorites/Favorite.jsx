@@ -1,7 +1,7 @@
 import styles from "./Favorite.module.css";
 import React, { useState, useEffect } from "react";
 import { Redirect, useHistory } from "react-router-dom";
-import { getMovies, getMoviePosterURL, getGenre } from "../../data/movies.data";
+import { getMoviePosterURL } from "../../data/movies.data";
 import { getItems, setItems } from "../../helpers/localStorage";
 import { Routes } from "../../constants/router";
 import { Bookmark, Minus } from "../Icons";
@@ -54,99 +54,53 @@ export default function Favorite() {
   const [movies, setMovies] = useState([]);
   const [isAuth, setIsAuth] = useState(Boolean(getItems("isAuth")));
   const [currentUser] = useState(getItems("currentUser"));
-  const [favoriteMovies, setFavoriteMovies] = useState(
-    getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : []
-  );
-  const [currentUserFavMovies, setCurrentUserFavMovies] = useState([]);
+  const [allFavorites,setAllFavorites] = useState([]);
 
   useEffect(() => {
-    const favMovies = favoriteMovies.length > 0 ? favoriteMovies : [];
-    const currentUserFav = favMovies.filter((el) => {
+    setIsAuth(Boolean(getItems("isAuth")));
+  }, []);
+
+  useEffect(() => {
+    let favoriteMovies =
+      getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : [];
+      setAllFavorites(favoriteMovies);
+    const currentUserFav = favoriteMovies.filter((el) => {
       return el.userId === currentUser;
     });
+   
+    if (
+      currentUserFav.length > 0 &&
+      typeof currentUserFav[0].movieIds !== "undefined"
+    ) {
+      const favoriteMovieObjs = currentUserFav[0].movieIds;
 
-    setCurrentUserFavMovies(
-      currentUserFav.length > 0 ? currentUserFav[0].movieIds : []
-    );
-  }, [favoriteMovies, currentUser]);
+      setMovies(Object.values(favoriteMovieObjs));
+      console.log("firstMovies=", Object.values(favoriteMovieObjs));
+    }
+  }, [currentUser]);
 
-  useEffect(() => {
-    let mounted = true;
-    setIsAuth(Boolean(getItems("isAuth")));
-    getMovies().then((result) => {
-      getGenre().then((res) => {
-        const movies = result.results.map((el) => {
-          if (typeof el.genre_ids !== "undefined") {
-            let genreNames = el.genre_ids.map((elem) => {
-              let name = res.genres.filter((el) => {
-                return elem === el.id;
-              });
-              return name[0].name;
-            });
-            return { ...el, genre_ids: [...genreNames] };
-          }
-          return el;
-        });
-        let favMovies = currentUserFavMovies.map((el) => {
-          const favMovie = movies.filter((elem) => {
-            return Number(el) === Number(elem.id);
-          });
-
-          return favMovie[0];
-        });
-        if (mounted) {
-          setMovies([...favMovies]);
-        }
-      });
-    });
-
-    return function cleanup() {
-      mounted = false;
-    };
-  }, [currentUserFavMovies]);
-
-  const handleIsBookmark = (id) => (ev) => {
+  const handleIsBookmark = (el) => (ev) => {
     ev.stopPropagation();
-    const favMovies =
-      getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : [];
-
-    if (id !== "") {
-      if (favMovies.length > 0) {
-        const currentUserFav = favMovies.filter((el) => {
-          return String(el.userId) === String(currentUser);
-        });
-        if (currentUserFav.length > 0) {
-          let favIds = currentUserFav[0].movieIds;
-          let updatedFavIds = [];
-          if (favIds.includes(id)) {
-            updatedFavIds = favIds.filter((el) => {
-              return Number(id) !== Number(el);
-            });
-          } else {
-            updatedFavIds = [...favIds, id];
-          }
-          let updatedFavMovies = favMovies.map((el) => {
-            if (String(el.userId) === String(currentUser)) {
-              return { userId: currentUser, movieIds: updatedFavIds };
-            }
-            return el;
-          });
-          setItems("favoriteMovies", updatedFavMovies);
-          setFavoriteMovies(updatedFavMovies);
-        } else {
-          setItems("favoriteMovies", [
-            ...favMovies,
-            { userId: currentUser, movieIds: [id] },
-          ]);
-          setFavoriteMovies([
-            ...favMovies,
-            { userId: currentUser, movieIds: [id] },
-          ]);
-        }
-      } else {
-        setItems("favoriteMovies", [{ userId: currentUser, movieIds: [id] }]);
-        setFavoriteMovies([{ userId: currentUser, movieIds: [id] }]);
-      }
+ 
+    const id = el.id;
+    if (id !== "" && allFavorites.length > 0) {
+      const newFavoriteMovies = allFavorites.map((elem)=>{
+      
+          if(elem.userId === currentUser){ 
+             if(typeof elem.movieIds !== "undefined"){
+               if (Object.keys(elem.movieIds).includes(String(id))) {
+                 delete elem.movieIds[id];
+               }
+             }
+             setMovies(Object.values(elem.movieIds));
+             return {...elem, movieIds:{...elem.movieIds}}
+           }
+           return elem;
+      });
+  
+      console.log(newFavoriteMovies)
+      // setMovies()
+       setItems("favoriteMovies",newFavoriteMovies);
     }
   };
 
@@ -167,14 +121,14 @@ export default function Favorite() {
                 onClick={handleMovie(el.id)}
               >
                 <div className={styles.bookmark}>
-                  {currentUserFavMovies.some((elem) => {
+                  {movies.some((elem) => {
                     return Number(elem) === Number(el.id);
                   }) ? (
-                    <div onClick={handleIsBookmark(el.id)}>
+                    <div onClick={handleIsBookmark(el)}>
                       <Minus id={el.id} />
                     </div>
                   ) : (
-                    <div onClick={handleIsBookmark(el.id)}>
+                    <div onClick={handleIsBookmark(el)}>
                       <Bookmark id={el.id} />
                     </div>
                   )}
