@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getItems } from "../helpers/localStorage";
 import { Redirect } from "react-router-dom";
-import { Routes } from "../constants/router";
-import error from '../data/Error.jpg';
+import { getItems } from "../../helpers/localStorage";
+import { Routes } from "../../constants/router";
+import error from "../../data/Error.jpg";
+
 let classNames = require("classnames");
 
 const errorImg = classNames(["w-full"]);
@@ -13,6 +14,7 @@ export default function Error() {
   useEffect(() => {
     setIsAuth(Boolean(getItems("isAuth")));
   }, []);
+
   return isAuth ? (
     <>
       <img src={error} className={errorImg} alt="error" />

@@ -1,11 +1,12 @@
-import styles from "./Favorite.module.css";
 import React, { useState, useEffect } from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import { getMoviePosterURL } from "../../data/movies.data";
 import { getItems, setItems } from "../../helpers/localStorage";
 import { Routes } from "../../constants/router";
-import { Bookmark, Minus } from "../Icons";
-import { EmptyCoverPicture } from "../Pictures";
+import { Minus } from "../Icons/Icons";
+import { EmptyCoverPicture } from "../Pictures/Pictures";
+import styles from "./Favorite.module.css";
+
 let classNames = require("classnames");
 
 const container = classNames({
@@ -54,7 +55,7 @@ export default function Favorite() {
   const [movies, setMovies] = useState([]);
   const [isAuth, setIsAuth] = useState(Boolean(getItems("isAuth")));
   const [currentUser] = useState(getItems("currentUser"));
-  const [allFavorites,setAllFavorites] = useState([]);
+  const [allFavorites, setAllFavorites] = useState([]);
 
   useEffect(() => {
     setIsAuth(Boolean(getItems("isAuth")));
@@ -63,11 +64,11 @@ export default function Favorite() {
   useEffect(() => {
     let favoriteMovies =
       getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : [];
-      setAllFavorites(favoriteMovies);
+    setAllFavorites(favoriteMovies);
     const currentUserFav = favoriteMovies.filter((el) => {
       return el.userId === currentUser;
     });
-   
+
     if (
       currentUserFav.length > 0 &&
       typeof currentUserFav[0].movieIds !== "undefined"
@@ -81,26 +82,25 @@ export default function Favorite() {
 
   const handleIsBookmark = (el) => (ev) => {
     ev.stopPropagation();
- 
+
     const id = el.id;
     if (id !== "" && allFavorites.length > 0) {
-      const newFavoriteMovies = allFavorites.map((elem)=>{
-      
-          if(elem.userId === currentUser){ 
-             if(typeof elem.movieIds !== "undefined"){
-               if (Object.keys(elem.movieIds).includes(String(id))) {
-                 delete elem.movieIds[id];
-               }
-             }
-             setMovies(Object.values(elem.movieIds));
-             return {...elem, movieIds:{...elem.movieIds}}
-           }
-           return elem;
+      const newFavoriteMovies = allFavorites.map((elem) => {
+        if (elem.userId === currentUser) {
+          if (typeof elem.movieIds !== "undefined") {
+            if (Object.keys(elem.movieIds).includes(String(id))) {
+              delete elem.movieIds[id];
+            }
+          }
+          setMovies(Object.values(elem.movieIds));
+          return { ...elem, movieIds: { ...elem.movieIds } };
+        }
+        return elem;
       });
-  
-      console.log(newFavoriteMovies)
+
+      console.log(newFavoriteMovies);
       // setMovies()
-       setItems("favoriteMovies",newFavoriteMovies);
+      setItems("favoriteMovies", newFavoriteMovies);
     }
   };
 
@@ -121,17 +121,9 @@ export default function Favorite() {
                 onClick={handleMovie(el.id)}
               >
                 <div className={styles.bookmark}>
-                  {movies.some((elem) => {
-                    return Number(elem) === Number(el.id);
-                  }) ? (
-                    <div onClick={handleIsBookmark(el)}>
-                      <Minus id={el.id} />
-                    </div>
-                  ) : (
-                    <div onClick={handleIsBookmark(el)}>
-                      <Bookmark id={el.id} />
-                    </div>
-                  )}
+                  <div onClick={handleIsBookmark(el)}>
+                    <Minus id={el.id} />
+                  </div>
                 </div>
 
                 <div className={styles.about}>

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
-import { getMovieById, getMoviePosterURLFor400 } from "./../data/movies.data";
-import { getItems } from "../helpers/localStorage";
-import { Routes } from "../constants/router";
-import {EmptyCoverPicture} from "./Pictures";
+import { getMovieById, getMoviePosterURLFor400 } from "../../data/movies.data";
+import { getItems } from "../../helpers/localStorage";
+import { Routes } from "../../constants/router";
+import { EmptyCoverPicture } from "../Pictures/Pictures";
+
 let classNames = require("classnames");
 
 const container = classNames(["p-20", "min-h-screen", "bg-indigo-900"]);
+
 const cardContainer = classNames([
   "max-w-md",
   "mx-auto",
@@ -18,7 +20,9 @@ const cardContainer = classNames([
 ]);
 
 const imgContainer = classNames(["md:flex-shrink-0"]);
+
 const img = classNames(["h-96", "w-full", "object-cover", "md:w-48"]);
+
 const title = classNames([
   "uppercase",
   "tracking-wide",
@@ -26,9 +30,13 @@ const title = classNames([
   "text-indigo-500",
   "font-semibold",
 ]);
+
 const overview = classNames(["mt-2", "text-gray-500"]);
+
 const releaseDate = classNames(["mt-10", "text-blue-500"]);
+
 const card = classNames(["md:flex"]);
+
 const about = classNames(["p-8"]);
 
 export default function Movie(props) {
@@ -66,7 +74,7 @@ export default function Movie(props) {
                 alt={movieInfo.title}
               />
             ) : (
-              <EmptyCoverPicture/>
+              <EmptyCoverPicture />
             )}
           </div>
           <div className={about}>

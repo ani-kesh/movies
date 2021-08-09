@@ -1,12 +1,11 @@
-
 import { BrowserRouter as Router } from "react-router-dom";
-import  General  from "./components/General";
+import General from "./components/General/General";
 
 function App() {
   return (
     <div>
-      <Router> 
-        <General/>      
+      <Router>
+        <General />
       </Router>
     </div>
   );

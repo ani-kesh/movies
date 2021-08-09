@@ -1,11 +1,11 @@
-import styles from "./Movies.module.css";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import { getMovies, getMoviePosterURL, getGenre } from "../../data/movies.data";
 import { getItems, setItems } from "../../helpers/localStorage";
 import { Routes } from "../../constants/router";
-import { Bookmark, Minus } from "../Icons";
-import { EmptyCoverPicture } from "../Pictures";
+import { Bookmark, Minus } from "../Icons/Icons";
+import { EmptyCoverPicture } from "../Pictures/Pictures";
+import styles from "./Movies.module.css";
 
 let classNames = require("classnames");
 
@@ -17,6 +17,7 @@ const container = classNames({
   "bg-indigo-900": true,
   "min-h-screen": true,
 });
+
 const title = classNames([
   "w-full",
   "flex",
@@ -51,6 +52,7 @@ const genreItem = classNames([
 
 export default function Movies({ searchResult }) {
   let history = useHistory();
+
   const [allMovies, setAllMovies] = useState([]);
   const [movies, setMovies] = useState([]);
   const [isAuth, setIsAuth] = useState(Boolean(getItems("isAuth")));
@@ -58,14 +60,13 @@ export default function Movies({ searchResult }) {
   const [favoriteMovies, setFavoriteMovies] = useState(
     getItems("favoriteMovies") !== null ? getItems("favoriteMovies") : []
   );
-
   const [currentUserFavMovies, setCurrentUserFavMovies] = useState([]);
-
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
 
   const observer = useRef();
+
   const lastMovieElRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();

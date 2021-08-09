@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { getItems, setItems } from "./../helpers/localStorage";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { getItems, setItems } from "../../helpers/localStorage";
+
 let classNames = require("classnames");
 
 const container = classNames([
@@ -11,6 +12,7 @@ const container = classNames([
   "items-center",
   "bg-indigo-400",
 ]);
+
 const containerLogin = classNames([
   "px-8",
   "pt-6",
@@ -20,6 +22,7 @@ const containerLogin = classNames([
   "flex-wrap",
   "w-1/2",
 ]);
+
 const divContainer = classNames(["m-3", "w-full"]);
 
 const inputClass = classNames({
@@ -33,7 +36,7 @@ const inputClass = classNames({
   "text-grey-darker": true,
 });
 
-let buttonClass = classNames({
+const buttonClass = classNames({
   "bg-black": true,
   "hover:bg-blue-dark": true,
   "hover:bg-opacity-100": true,
@@ -128,4 +131,5 @@ function Login() {
     </div>
   );
 }
+
 export default Login;

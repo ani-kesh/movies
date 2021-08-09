@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Input from "./Input";
-import { Routes } from "../constants/router";
+import { Routes } from "../../constants/router";
+import Input from "../Input/Input";
+
 let classNames = require("classnames");
 
 const nav = classNames({ "bg-indigo-900": true, block: true });
+
 const navDesktop = classNames([
   "max-w-7xl",
   "mx-auto",
@@ -12,6 +14,7 @@ const navDesktop = classNames([
   "sm:px-6",
   "lg:px-8",
 ]);
+
 const navButtons = classNames([
   "relative",
   "flex",
@@ -19,6 +22,7 @@ const navButtons = classNames([
   "justify-between",
   "h-16",
 ]);
+
 const navButtonsMenu = classNames([
   "flex-1",
   "flex",
@@ -27,12 +31,14 @@ const navButtonsMenu = classNames([
   "sm:items-stretch",
   "sm:justify-start",
 ]);
+
 const navButtonLogo = classNames([
   "flex-shrink-0",
   "flex",
   "items-center",
   "text-white",
 ]);
+
 const linkText = classNames([
   "text-gray-300",
   "hover:bg-gray-700",
@@ -43,6 +49,7 @@ const linkText = classNames([
   "text-sm",
   "font-medium",
 ]);
+
 const signOutContainer = classNames([
   "absolute",
   "inset-y-0",
@@ -80,13 +87,17 @@ const searchStyle = classNames([
   "leading-tight",
   "focus:outline-none",
 ]);
+
 const navButtonsRouter = classNames(["hidden", "sm:block", "sm:ml-6"]);
+
 const signOut = classNames(["ml-3", "relative"]);
 
-/* mobile styles */
+/* mobile styles start*/
 
 const mobileMenu = classNames(["sm:hidden"]);
+
 const navItem = classNames(["px-2", "pt-2", "pb-3", "space-y-1"]);
+
 const navBtn = classNames([
   "bg-gray-900",
   "text-white",
@@ -97,6 +108,8 @@ const navBtn = classNames([
   "text-base",
   "font-medium",
 ]);
+
+/* mobile styles end*/
 
 export default function Nav({ search, logOut }) {
   return (

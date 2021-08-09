@@ -1,8 +1,7 @@
-
-import Login from "../components/Login";
+import Login from "../components/Login/Login";
 import Movies from "../components/Movies/Movies";
-import Movie from "../components/Movie";
-import Error from "../components/Error";
+import Movie from "../components/Movie/Movie";
+import Error from "../components/Error/Error";
 import Favorite from "../components/Favorites/Favorite";
 
 export const Routes = {
@@ -12,7 +11,7 @@ export const Routes = {
     text: "Best Movies",
     component: Movies,
   }),
-  movie: (id=":movieId") => ({
+  movie: (id = ":movieId") => ({
     path: `/movie/${id}`,
     text: "Movie",
     component: Movie,

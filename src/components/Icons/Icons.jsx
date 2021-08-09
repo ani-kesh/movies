@@ -1,4 +1,4 @@
-export const Bookmark = ({  id }) => {
+export const Bookmark = ({ id }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -18,7 +18,7 @@ export const Bookmark = ({  id }) => {
   );
 };
 
-export const Minus = ({  id }) => {
+export const Minus = ({ id }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
